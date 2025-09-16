@@ -1,3 +1,4 @@
+use nix::libc::pid_t;
 use nix::sys::wait::wait;
 use nix::sys::wait::WaitStatus;
 use nix::unistd::fork;
@@ -6,6 +7,15 @@ use nix::unistd::write;
 use nix::libc;
 //use nix::{sys::wait::waitpid,unistd::{fork, ForkResult, write}};
 
+
+fn fork_c_like() -> pid_t {
+    let fork_result = unsafe { fork() };
+    match fork_result {
+        Ok(ForkResult::Parent { child, .. }) => child.as_raw(),
+        Ok(ForkResult::Child) => 0,
+        Err(_) => -1,
+    }
+}
 
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {

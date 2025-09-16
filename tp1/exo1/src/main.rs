@@ -13,7 +13,10 @@ fn main() {
             option_g = true;
         }
     }
-    if option_g { dbg!(&args); }
+    if option_g { 
+        dbg!(&args);
+        // println!("{:?}", &args);
+    }
     for arg in &args[1..] {
         if arg != "-g" {
             println!("Bonjour, {}!", arg);
