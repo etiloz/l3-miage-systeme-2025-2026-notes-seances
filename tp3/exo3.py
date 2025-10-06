@@ -1,7 +1,14 @@
+# NOTE: La gestion du chaînage de commande ne fonctionne que pour des `&&`
+# TODO: traiter la question 3 de l'exercice
+
 import os, sys
+
+internal_cmds = ["exit", "cd", "env", "history"]
 
 def exec_cmd(cmd_line):
     args = cmd_line.split(" ")
+    if args[0] in internal_cmds:
+        exec_internal_cmd(cmd_line)
     if os.fork() == 0:
         try:
             os.execvp(args[0], args)
@@ -10,8 +17,6 @@ def exec_cmd(cmd_line):
             sys.exit(127)
     _pid, status = os.wait()
     return status
-
-internal_cmds = ["exit", "cd", "env", "history"]
 
 def exec_internal_cmd(cmd_line):
     global history

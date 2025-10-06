@@ -25,8 +25,11 @@ while True:
             os.execvp(args[0], args)
             # partie de code non ateignable, le fils a changé de code, il terminera avec un exit dans son nouveau code
             assert(false)
-        except:
-            print(f"microsh: command not found: {args[0]}", file=sys.stderr)
+        except FileNotFoundError:
+            print("microsh: command not found", file=sys.stderr)
             sys.exit(127)
+        except PermissionError:
+            print("microsh: permission denied", file=sys.stderr)
+            sys.exit(126)
 
     os.wait()
