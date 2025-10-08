@@ -64,7 +64,6 @@ def split_multi_sep(s, separators):
         s = s.replace(sep, "✂️" + sep + "✂️")
     return [x for x in s.split("✂️") if x != '']
 
-
 history = []
 while True:
     try:
@@ -72,7 +71,12 @@ while True:
     except EOFError: # l'entrée standard est fermée
         sys.exit()
     history.append(cmd_line)
-    parsed_cmd_line = split_multi_sep(cmd_line, ["&&", "||", ";"])
-    print(parsed_cmd_line)
-    for cmd in parsed_cmd_line[::2]:
-        exec_cmd(cmd)
+    parsed_cmd_line = split_multi_sep(cmd_line, [";", "&&", "||"])
+    status = exec_cmd(parsed_cmd_line[0])
+    for i in range(1,len(parsed_cmd_line),2):
+        sep = parsed_cmd_line[i]
+        cmd_elementaire = parsed_cmd_line[i+1]
+        if (sep == "&&" and status != 0) or (sep == "||" and status == 0):
+            # skip next cmd_elementaire
+            continue
+        status = exec_cmd(cmd_elementaire)
