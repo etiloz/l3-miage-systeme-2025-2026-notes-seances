@@ -23,7 +23,7 @@ if fork_result == 0:
         print("tictac")   # ou simplement signal.pause()
         time.sleep(1)
     time.sleep(1) # pour laisser le temps au père d'envoyer SIGUSR2
-    sys.exit(0) # fin du fils
+    sys.exit() # fin du fils
 else:
     # père
     time.sleep(1) # pour laisser le temps au fils d'installer ses gestionnaires
