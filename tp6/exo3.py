@@ -1,16 +1,22 @@
 import os, sys
-fd_read,fd_write = os.pipe() # création et ouverture du tube anonyme
-fork_result = os.fork()
-if fork_result == 0:
-    # os.close(fd_write)  
-    os.dup2(fd_read, 0) # redirection: le tube alimente l'entrée standard
-    os.execvp("bash", ["bash"])
-os.close(fd_read)
-while True:
-    msg = os.read(0, 100)
-    if len(msg) == 0 : 
-        break
-    os.write(fd_write, msg)
-os.close(fd_write)
-print("attente de la fin du fils...")
-os.wait()
+CHUNK_SIZE = 1024
+
+def capture_stdout(cmd, args):
+    fd_read,fd_write = os.pipe() # création et ouverture du tube anonyme
+    fork_result = os.fork()
+    if fork_result == 0:
+        os.close(fd_read)  
+        os.dup2(fd_write, 1) # redirection: la sortie standard alimente le tube
+        os.execvp(cmd, args)
+    os.close(fd_write)
+    buffer = []
+    while True:
+        chunk = os.read(fd_read, CHUNK_SIZE)
+        if chunk == b'':
+            break
+        buffer.append(chunk)
+    return b''.join(buffer).decode('utf-8')
+
+if __name__ == "__main__":
+    output = capture_stdout("ls", ["ls", "-l", "/"])
+    print("Captured output:\n", output)
